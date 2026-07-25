@@ -1,5 +1,11 @@
 # rpt (development version)
 
+- Contributing docs now ask for screenshots of the rendered documentation
+  site on pull requests that change it, preferring a link into the PR-preview
+  deployment over a local capture, and repair an unbalanced code fence that
+  was making several sections of `.github/copilot-instructions.md` render as
+  a code block (#43).
+
 - `_docs_base_url()` in the version dropdown generator
   (`.github/scripts/generate_version_dropdown.py`) now warns on `stderr` when
   it falls back to the hard-coded `https://d-morrison.github.io/rpt/` default
