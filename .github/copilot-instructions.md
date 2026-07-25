@@ -127,11 +127,6 @@ altdoc::preview_docs()    # Launch preview server
 
 # Only commit and push if all checks pass AND visual inspection confirms correct rendering
 ```
-# Check docs/vignettes/*.md for correct output
-# Verify links and images work correctly
-
-# Only commit and push if all checks pass AND visual inspection confirms correct rendering
-```
 
 ## Package Structure
 
@@ -225,6 +220,27 @@ Instead of just changing `@v2.9.4` to `@v2`, include in your commit message or P
 > "Using @v2 (moving tag) instead of @v2.9.4 (pinned version) to automatically receive bug fixes and updates within the v2 major version while maintaining stability."
 
 This proactive communication prevents reviewers from needing to ask clarifying questions and helps future maintainers understand the decisions made.
+
+### Screenshots of the Rendered Site
+
+When a change affects the rendered documentation site, include screenshots of
+the affected pages in the pull request, whenever possible. A reviewer can then
+see the result without checking out the branch and running
+`altdoc::render_docs()` themselves.
+
+This applies to any change whose effect is visual: vignette or article prose,
+math rendering, figures, navbar and sidebar structure, theming, or the version
+dropdown.
+
+- Prefer the **PR preview deployment** over a local screenshot when one is
+  available -- `docs.yaml` posts its URL as a sticky comment, and a link to the
+  specific affected page lets the reviewer click straight to it.
+- Screenshot the **specific element that changed**, not the whole page, when
+  the change is small.
+- For a change to existing output, a **before/after pair** is far more useful
+  than the after alone.
+- Say so explicitly when a change *cannot* be shown this way (a build-time
+  fix with no visual result), so silence is not mistaken for an oversight.
 
 ### Before Requesting Human Review
 
