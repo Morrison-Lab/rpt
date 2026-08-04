@@ -260,3 +260,5 @@ The template includes GitHub Actions workflows for:
 ### Workflow Time Limits
 
 Every job in a GitHub Actions workflow must set a `timeout-minutes` of at most 50. This caps the time a hung or runaway job can hold a runner. Place the key right after `runs-on:`. When adding a new workflow or job, set `timeout-minutes: 50` unless a tighter bound clearly fits.
+
+The exception is a job that calls a reusable workflow (`uses:` at the job level): GitHub forbids `timeout-minutes` (and `runs-on:`) on such a job, so its runtime is bounded by the reusable workflow's own `timeout-minutes` instead. The `Morrison-Lab/gha` reusable Claude workflows cap at 60, so `claude.yml` and `claude-code-review.yml` effectively run to 60 minutes rather than 50. That 10-minute allowance is accepted as the cost of consuming the shared, upstream-maintained workflows.

@@ -6,12 +6,21 @@
 # and review re-dispatch when Claude pushes commits, the cost comment, and
 # push-failure reporting.
 #
-# Two deliberate changes from the pre-migration workflow (see #182):
-#   - contents: write (was read): the agent can now push branches and open
-#     PRs, where the bespoke agent was comment-only.
-#   - a trusted-author gate (OWNER/MEMBER/COLLABORATOR): the bespoke workflow
-#     had none, so this gate is what makes the write upgrade safe. The two
-#     are coupled -- write access without the author gate would be a hole.
+# Deliberate changes from the pre-migration workflow (see #182):
+#   - Permissions escalate from the bespoke read-only set, because the reusable
+#     agent needs write access to do its job:
+#       * contents: read -> write  -- push branches, open PRs (was comment-only)
+#       * issues:   read -> write  -- post issue/PR comments (ack + response)
+#       * actions:  read -> write  -- dispatch the review workflow (gh workflow run)
+#       * id-token: write          -- unchanged
+#   - A trusted-author gate (OWNER/MEMBER/COLLABORATOR): the bespoke workflow
+#     had none, so this gate is what makes the write escalations safe. They are
+#     coupled -- write access without the author gate would be a hole.
+#   - Effective timeout 50 -> 60 min: a `uses:` reusable-workflow-call job cannot
+#     set timeout-minutes at the caller, so runtime is bounded by the reusable's
+#     own timeout-minutes: 60 (the lab standard). Same structural trade-off as
+#     claude-code-review.yml (#181); see copilot-instructions.md's Workflow Time
+#     Limits reusable-call exception.
 #
 # Secrets are passed explicitly (not `secrets: inherit`) to match the
 # canonical stub and stay robust. Requires the CLAUDE_CODE_OAUTH_TOKEN
