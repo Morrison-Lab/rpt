@@ -1,3 +1,32 @@
+# Thin caller of the canonical Morrison-Lab/gha @claude agent workflow,
+# adapted for rpt. Migrated from a bespoke anthropics/claude-code-action@v1
+# workflow (see #182; the review-workflow half was #181 / #178) so rpt's
+# @claude agent inherits upstream hardening automatically as @v2 slides:
+# the bot-actor self-trigger guard, late-comment polling, reviewer re-request
+# and review re-dispatch when Claude pushes commits, the cost comment, and
+# push-failure reporting.
+#
+# Deliberate changes from the pre-migration workflow (see #182):
+#   - Permissions escalate from the bespoke read-only set, because the reusable
+#     agent needs write access to do its job:
+#       * contents: read -> write  -- push branches, open PRs (was comment-only)
+#       * issues:   read -> write  -- post issue/PR comments (ack + response)
+#       * actions:  read -> write  -- dispatch the review workflow (gh workflow run)
+#       * id-token: write          -- unchanged
+#   - A trusted-author gate (OWNER/MEMBER/COLLABORATOR): the bespoke workflow
+#     had none, so this gate is what makes the write escalations safe. They are
+#     coupled -- write access without the author gate would be a hole.
+#   - Effective timeout 50 -> 60 min: a `uses:` reusable-workflow-call job cannot
+#     set timeout-minutes at the caller, so runtime is bounded by the reusable's
+#     own timeout-minutes: 60 (the lab standard). Same structural trade-off as
+#     claude-code-review.yml (#181); see copilot-instructions.md's Workflow Time
+#     Limits reusable-call exception.
+#
+# Secrets are passed explicitly (not `secrets: inherit`) to match the
+# canonical stub and stay robust. Requires the CLAUDE_CODE_OAUTH_TOKEN
+# repository secret; WORKFLOW_TOKEN is optional (only for editing
+# .github/workflows). See Morrison-Lab/gha examples/claude.yml for the
+# upstream stub.
 name: Claude Code
 
 on:
@@ -12,76 +41,43 @@ on:
 
 jobs:
   claude:
+    # Only invoke the reusable workflow when an @claude mention is present AND
+    # the author is trusted (OWNER/MEMBER/COLLABORATOR), so an untrusted
+    # commenter's mention doesn't spawn a run with elevated (write)
+    # permissions. The reusable workflow re-checks this as defense-in-depth.
     if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-    runs-on: ubuntu-latest
-    timeout-minutes: 50
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude') && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.review.author_association)) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association))
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
-      issues: read
+      issues: write
       id-token: write
-      actions: read # Required for Claude to read CI results on PRs
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-
-      - name: Remove review request from d-morrison while Claude is working
-        id: remove_reviewer
-        if: github.event.pull_request.number || github.event.issue.pull_request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER="${{ github.event.pull_request.number || github.event.issue.number }}"
-          # On any GET error / empty response, treat as "not a reviewer" so
-          # both the DELETE below and the matching re-request step skip,
-          # leaving the PR state untouched rather than partially modified.
-          HAD_REVIEWER=$(gh api "repos/${{ github.repository }}/pulls/$PR_NUMBER" \
-            --jq '[.requested_reviewers[].login] | any(. == "d-morrison")' \
-            2>/dev/null) || HAD_REVIEWER=false
-          if [ -z "$HAD_REVIEWER" ]; then HAD_REVIEWER=false; fi
-          echo "had_reviewer=$HAD_REVIEWER" >> "$GITHUB_OUTPUT"
-          if [ "$HAD_REVIEWER" = "true" ]; then
-            gh api -X DELETE \
-              "repos/${{ github.repository }}/pulls/$PR_NUMBER/requested_reviewers" \
-              -f "reviewers[]=d-morrison" \
-              || echo "::warning::failed to remove d-morrison from reviewers on PR #$PR_NUMBER"
-          fi
-
-      - name: Run Claude Code
-        id: claude
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-
-          # This is an optional setting that allows Claude to read CI results on PRs
-          additional_permissions: |
-            actions: read
-
-          # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
-          # prompt: 'Update the pull request description to include a summary of changes.'
-
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
-
-      - name: Re-request review from d-morrison when Claude finishes
-        if: |
-          always() &&
-          (github.event.pull_request.number || github.event.issue.pull_request) &&
-          steps.remove_reviewer.outputs.had_reviewer == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER="${{ github.event.pull_request.number || github.event.issue.number }}"
-          gh api -X POST \
-            "repos/${{ github.repository }}/pulls/$PR_NUMBER/requested_reviewers" \
-            -f "reviewers[]=d-morrison" \
-            || echo "::warning::failed to re-request d-morrison as reviewer on PR #$PR_NUMBER"
-
+      actions: write       # dispatch the review workflow via `gh workflow run`
+    uses: Morrison-Lab/gha/.github/workflows/claude.yml@v2
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}   # optional; for editing .github/workflows
+    with:
+      # rpt uses Quarto for its vignettes and website (VignetteBuilder: quarto,
+      # Config/Needs/website: quarto), so give the agent Quarto to render/check.
+      install-quarto: true
+      # setup-r (default true) and use-renv (default false) are left as-is:
+      # rpt CI restores dependencies from DESCRIPTION via setup-r-dependencies,
+      # not from the renv.lock, so DESCRIPTION-based restore matches CI.
+      prompt-addendum: |
+        This is an R package following UCD-SERG standards. Before committing:
+        - `devtools::document()` -- roxygen2 docs must be in sync
+          (R-check-docs.yml enforces this). Don't hand-edit NAMESPACE or man/.
+        - `lintr::lint_package()` -- `.lintr.R` is authoritative: snake_case
+          names, line length <= 80, no `T`/`F` for TRUE/FALSE, no `:::`
+          internal calls, tidyverse idioms, native `|>` pipe.
+        - `spelling::spell_check_package()`.
+        - `devtools::test()` -- cover new/changed behaviour with testthat; use
+          `set.seed()` so snapshots are deterministic.
+        - Add a `NEWS.md` bullet for any user-facing change (news.yaml enforces
+          this; a missing entry is a CI failure).
+        - `README.md` is generated from `README.Rmd`; edit the `.Rmd`.
+        - No new dependencies without a `DESCRIPTION` entry.
