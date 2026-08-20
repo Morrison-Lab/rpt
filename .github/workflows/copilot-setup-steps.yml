@@ -85,7 +85,7 @@ jobs:
             any::lintr
             any::spelling
             any::rmarkdown
-            d-morrison/altdoc@recursive-qmd-search
+            d-morrison/altdoc@main
           needs: check
 
       # Set up Quarto - required for rendering the website

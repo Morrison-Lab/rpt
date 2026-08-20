@@ -141,7 +141,7 @@ jobs:
             connect
             website
           extra-packages: |
-            d-morrison/altdoc@recursive-qmd-search
+            d-morrison/altdoc@main
             quarto-dev/quarto-r
             any::sessioninfo
             local::.
