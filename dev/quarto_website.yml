@@ -33,7 +33,7 @@ website:
         menu:
           - text: "v1.0.2 (stable)"
             href: https://Morrison-Lab.github.io/rpt/latest-tag/
-          - text: "1.0.2.9002 (dev)"
+          - text: "1.0.2.9003 (dev)"
             href: https://Morrison-Lab.github.io/rpt/dev/
           - text: "---"
           - text: "v1.0.1"
