@@ -1,5 +1,8 @@
 # rpt (development version)
 
+- Switch altdoc dependency from `d-morrison/altdoc@recursive-qmd-search`
+  to `d-morrison/altdoc@main` (268 commits ahead, 0 behind).
+
 - Contributing docs now ask for screenshots of the rendered documentation
   site on pull requests that change it, preferring a link into the PR-preview
   deployment over a local capture, and repair an unbalanced code fence that
