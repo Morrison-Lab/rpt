@@ -82,7 +82,7 @@ jobs:
               | sort -V \
               | tail -n 1
           )
-          echo "latest_stable_tag=$LATEST_STABLE_TAG" >> "$GITHUB_OUTPUT"
+          echo "latest_stable_mainAG" >> "$GITHUB_OUTPUT"
 
       - name: Validate stable workflow_dispatch input
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.version == 'stable'
@@ -141,8 +141,13 @@ jobs:
             connect
             website
           extra-packages: |
+<<<<<<< Updated upstream
             d-morrison/altdoc@recursive-qmd-search
             quarto-dev/quarto-r
+=======
+            d-morrison/altdoc@main
+            quarto-dev/quarto
+>>>>>>> Stashed changes
             any::sessioninfo
             local::.
 
