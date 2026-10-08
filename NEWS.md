@@ -1,6 +1,6 @@
 # rpt (development version)
 
-* Added `AGENTS.md` and `.claude/settings.json` so AI coding agents load the shared lab rules from [`Morrison-Lab/ai-config`](https://github.com/Morrison-Lab/ai-config); both are excluded from the package build.
+* Added `AGENTS.md`, which points AI coding agents to the shared lab rules in [`Morrison-Lab/ai-config`](https://github.com/Morrison-Lab/ai-config), and registered the `Morrison-Lab` plugin marketplace in the existing `.claude/settings.json`; both are excluded from the package build.
 
 - Switch altdoc dependency from `d-morrison/altdoc@recursive-qmd-search`
   to `d-morrison/altdoc@main` (268 commits ahead, 0 behind).
