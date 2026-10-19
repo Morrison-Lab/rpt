@@ -1,6 +1,6 @@
 # rpt (development version)
 
-* The documentation check no longer fails when a newer roxygen2 only rewrites
+* The documentation check no longer fails when a newer `roxygen2` only rewrites
   the `Config/roxygen2/version` or `RoxygenNote` field in `DESCRIPTION`.
   It still fails on any other change to `DESCRIPTION`, `NAMESPACE`, or `man/`.
 
