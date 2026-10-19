@@ -6,6 +6,11 @@
 
 * Added `AGENTS.md`, which points AI coding agents to the shared lab rules in [`Morrison-Lab/ai-config`](https://github.com/Morrison-Lab/ai-config), and registered the `Morrison-Lab` plugin marketplace in the existing `.claude/settings.json`; both are excluded from the package build.
 
+* The `news.yaml` check now also runs on pull requests that change only workflow files.
+  The branch rules require it to report a status,
+  and a skipped workflow never reports,
+  so those pull requests could not merge.
+
 - Switch altdoc dependency from `d-morrison/altdoc@recursive-qmd-search`
   to `d-morrison/altdoc@main` (268 commits ahead, 0 behind).
 
