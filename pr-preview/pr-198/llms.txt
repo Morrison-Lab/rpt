@@ -13,6 +13,8 @@
 - [Check if we're rendering to a format that supports HTML widgets](https://d-morrison.github.io/rpt/vignettes/articles/package-structure.html)
 - [Generate sample data](https://d-morrison.github.io/rpt/vignettes/articles/quarto_article.html)
 - [Example usage](https://d-morrison.github.io/rpt/vignettes/getting-started.html)
+- [AGENTS](https://d-morrison.github.io/rpt/vignettes/macros/AGENTS.html)
+- [CLAUDE](https://d-morrison.github.io/rpt/vignettes/macros/CLAUDE.html)
 - [CONTRIBUTING](https://d-morrison.github.io/rpt/vignettes/macros/CONTRIBUTING.html)
 - [README](https://d-morrison.github.io/rpt/vignettes/macros/README.html)
 - [Register the macros with pandoc's static math parser (texmath).](https://d-morrison.github.io/rpt/vignettes/macros/demo-include-in-header.html)
