@@ -1,5 +1,9 @@
 # rpt (development version)
 
+* The documentation check no longer fails when a newer `roxygen2` only rewrites
+  the `Config/roxygen2/version` or `RoxygenNote` field in `DESCRIPTION`.
+  It still fails on any other change to `DESCRIPTION`, `NAMESPACE`, or `man/`.
+
 * Added `AGENTS.md`, which points AI coding agents to the shared lab rules in [`Morrison-Lab/ai-config`](https://github.com/Morrison-Lab/ai-config), and registered the `Morrison-Lab` plugin marketplace in the existing `.claude/settings.json`; both are excluded from the package build.
 
 - Switch altdoc dependency from `d-morrison/altdoc@recursive-qmd-search`
