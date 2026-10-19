@@ -1,5 +1,11 @@
 # rpt (development version)
 
+* Removed the `summary.yml` workflow that summarized new issues,
+  because the inference endpoint it called is retired
+  ([`gha#1133`](https://github.com/Morrison-Lab/gha/issues/1133) tracks a replacement).
+
+* `R CMD check` no longer reports the `vignettes/macros/.claude` directory of the `macros` submodule as a hidden directory.
+
 * The documentation check no longer fails when a newer `roxygen2` only rewrites
   the `Config/roxygen2/version` or `RoxygenNote` field in `DESCRIPTION`.
   It still fails on any other change to `DESCRIPTION`, `NAMESPACE`, or `man/`.
