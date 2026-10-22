@@ -105,7 +105,7 @@ filters:
   - slidebreak
   - d-morrison/div-anchors
   - d-morrison/equation-anchors
-  - sun123zxy/callouty-theorem
+  - Morrison-Lab/callouty-theorem
   - coatless-quarto/custom-callout
   # Declaring `revealjs:` as a project-level format (instead of registering
   # this filter here) would apply RevealJS as a format to every rendered
