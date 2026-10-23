@@ -1,8 +1,8 @@
 # rpt (development version)
 
-* The vendored `callouty-theorem` Quarto extension is now version 1.4.2,
+* The `callouty-theorem` Quarto extension, copied into the repository, is now version 1.4.2,
   under `altdoc/_extensions/Morrison-Lab/`, matching `lds`.
-  Callout titles now carry the crossref number, such as "Example 1 (A first example)".
+  Callout titles now carry the theorem number, such as "Example 1 (A first example)".
 
 * Removed the `summary.yml` workflow that summarized new issues,
   because the inference endpoint it called is retired
