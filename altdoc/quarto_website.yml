@@ -105,7 +105,7 @@ filters:
   - slidebreak
   - d-morrison/div-anchors
   - d-morrison/equation-anchors
-  - sun123zxy/callouty-theorem
+  - Morrison-Lab/callouty-theorem
   - coatless-quarto/custom-callout
   # Declaring `revealjs:` as a project-level format (instead of registering
   # this filter here) would apply RevealJS as a format to every rendered
@@ -126,12 +126,9 @@ callouty-theorem:
   # with override-title: false, Quarto's default callout title falls back to
   # the raw `type:` code (e.g. a rendered callout literally titled "Exm"
   # instead of "Example"). override-title: true renders the theorem-family
-  # English label plus the div's heading text, e.g. "Example (A first
-  # example)". Note this still doesn't produce Quarto's native crossref
-  # numbering ("Example 3.2") — wrapping the theorem in a generic callout
-  # (quarto.Callout) instead of rendering it as a native Theorem node loses
-  # that; a real numbered label would require deeper changes to the
-  # callouty-theorem extension itself.
+  # English label, the crossref number and the div's heading text, e.g.
+  # "Example 1 (A first example)" (callouty-theorem 1.4.2 adds the number;
+  # 1.1.0 gave "Example (A first example)").
   thm:
     override-title: true # override the callout title with
                          # the theorem-type label,

@@ -1,5 +1,9 @@
 # rpt (development version)
 
+* The `callouty-theorem` Quarto extension, copied into the repository, is now version 1.4.2,
+  under `altdoc/_extensions/Morrison-Lab/`, matching `lds`.
+  In HTML output, the callout titles of numbered divs now carry the theorem number, such as "Example 1 (A first example)".
+
 * `.github/scripts/apply-rulesets.sh` now treats an existing `protect-default-branch` ruleset
   (the shared base ruleset in `Morrison-Lab/ai-config`) as the same ruleset as `main`,
   so a repo that already has it is updated in place rather than given a second one.
