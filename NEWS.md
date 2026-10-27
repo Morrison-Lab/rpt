@@ -1,5 +1,9 @@
 # rpt (development version)
 
+* Added a `check-caller-permissions` workflow that fails a pull request when a job calls a
+  `Morrison-Lab/gha` reusable workflow without granting the permissions the called workflow's jobs request,
+  which GitHub rejects at startup with no log.
+
 * The `callouty-theorem` Quarto extension, copied into the repository, is now version 1.4.2,
   under `altdoc/_extensions/Morrison-Lab/`, matching `lds`.
   In HTML output, the callout titles of numbered divs now carry the theorem number, such as "Example 1 (A first example)".
